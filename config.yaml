@@ -1,0 +1,1 @@
+db: cander:123456@tcp(10.1.1.200:3306)/storage?charset=utf8mb4&parseTime=True&loc=Local

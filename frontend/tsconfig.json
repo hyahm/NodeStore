@@ -1,0 +1,18 @@
+{
+  "extends": "./.quasar/tsconfig.json",
+  "compilerOptions": {
+    // 其他配置不变
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types" // 确保包含自定义类型目录
+    ]
+  },
+  "include": [
+    "src/**/*.ts",
+    "src/**/*.d.ts", // 包含 .d.ts 类型文件
+    "src/**/*.tsx",
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.vue"
+  ]
+}
