@@ -1,6 +1,7 @@
 package db
 
 import (
+	"fmt"
 	"log"
 	"nodestore/app/config"
 	"sync"
@@ -17,11 +18,22 @@ var (
 // ==================== 数据库初始化 ====================
 func InitDB() error {
 	var err error
-	DB, err = gorm.Open(mysql.Open(config.Cfg.DB), &gorm.Config{})
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/?charset=utf8mb4&parseTime=True&loc=Local",
+		config.Cfg.DB.User,
+		config.Cfg.DB.Password,
+		config.Cfg.DB.Host,
+		config.Cfg.DB.Port,
+	)
+	DB, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("数据库连接失败:", err)
 	}
+	DB.Exec("CREATE DATABASE " + config.Cfg.DB.Dbname)
 
+	err = DB.Exec("use " + config.Cfg.DB.Dbname).Error
+	if err != nil {
+		log.Fatalf("连接到数据库 %s 连接失败:", config.Cfg.DB.Dbname)
+	}
 	// 1. 用户表
 	DB.Exec(`
 	CREATE TABLE IF NOT EXISTS users (

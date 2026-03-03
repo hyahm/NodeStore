@@ -7,7 +7,15 @@ import (
 )
 
 type Config struct {
-	DB string `json:"db" yaml:"db"`
+	DB Mysql `json:"db" yaml:"db"`
+}
+
+type Mysql struct {
+	User     string `json:"user" yaml:"user"`
+	Password string `json:"password" yaml:"password"`
+	Host     string `json:"host" yaml:"host"`
+	Port     int    `json:"port" yaml:"port"`
+	Dbname   string `json:"dbname" yaml:"dbname"`
 }
 
 var Cfg Config

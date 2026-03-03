@@ -2,21 +2,14 @@ package app
 
 import (
 	"fmt"
-	"nodestore/app/db"
 	"nodestore/app/handles"
 	"nodestore/app/response"
 
-	"github.com/hyahm/golog"
 	"github.com/hyahm/xmux"
 )
 
-func Run() {
-	err := db.InitDB()
-	if err != nil {
-		golog.Error("数据库初始化失败:", err)
-		return
-	}
-	defer golog.Sync()
+func Run(port int) {
+
 	res := &response.Response{}
 	router := xmux.NewRouter()
 	router.SetHeader("Access-Control-Allow-Origin", "*")
@@ -28,6 +21,7 @@ func Run() {
 
 	// 节点
 	node := handles.Node{}
+
 	router.Get("/node/add", node.AddNodeHandler)
 	router.Get("/node/remove", node.RemoveNodeHandler)
 	router.Get("/node/list", node.ListNodesHandler)
@@ -51,5 +45,5 @@ func Run() {
 	router.Get("/share/download", share.ShareDownloadHandler).BindResponse(nil)
 
 	fmt.Println("master :8080 - MD5 download + online stream (mp3/mp4)")
-	router.Run(":8080")
+	router.Run(fmt.Sprintf(":%d", port))
 }

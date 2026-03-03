@@ -9,6 +9,60 @@
       </q-toolbar>
     </q-header>
 
+    <!-- 侧边栏 -->
+    <q-drawer
+      v-model="drawerOpen"
+      show-if-above
+      bordered
+      class="bg-grey-1"
+      content-class="bg-white"
+    >
+      <q-list dense class="pt-0">
+        <!-- 侧边栏导航项 -->
+
+        <q-item
+          clickable
+          v-ripple
+          :to="{ name: 'FileManagement' }"
+          :active="isActive('/')"
+        >
+          <q-item-section avatar>
+            <q-icon name="storage" />
+          </q-item-section>
+          <q-item-section>文件管理</q-item-section>
+        </q-item>
+
+        
+        <q-item
+          clickable
+          v-ripple
+          :to="{ name: 'NodeManagement' }"
+          :active="isActive('/node-management')"
+        >
+          <q-item-section avatar>
+            <q-icon name="storage" />
+          </q-item-section>
+          <q-item-section>节点管理</q-item-section>
+        </q-item>
+
+
+         
+        
+        <!-- 可添加其他导航项 -->
+        <!-- <q-item
+          clickable
+          v-ripple
+          :to="{ name: 'OtherPage' }"
+          :active="isActive('/other-page')"
+        >
+          <q-item-section avatar>
+            <q-icon name="folder" />
+          </q-item-section>
+          <q-item-section>其他页面</q-item-section>
+        </q-item> -->
+      </q-list>
+    </q-drawer>
+
     <!-- 主内容区 -->
     <q-page-container>
       <router-view />
@@ -17,12 +71,24 @@
 </template>
 
 <script setup lang="ts">
-import { useRouter } from 'vue-router';
+import { ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { useQuasar, LocalStorage } from 'quasar';
-// import Cookies from 'js-cookie';
 
 const $q = useQuasar();
 const router = useRouter();
+const route = useRoute();
+
+// 侧边栏开关状态
+const drawerOpen = ref(true);
+
+/**
+ * 判断当前路由是否激活
+ * @param path 路由路径
+ */
+const isActive = (path: string) => {
+  return route.path === path;
+};
 
 /**
  * 退出登录

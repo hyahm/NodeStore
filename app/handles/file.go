@@ -69,7 +69,16 @@ func (File) UploadHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), 401)
 		return
 	}
-
+	// 7.2 获取节点
+	ns, err := pickNodesByUser(claims.UserID, common.K+common.M)
+	if err != nil {
+		http.Error(w, err.Error(), 500)
+		return
+	}
+	if len(ns) == 0 {
+		http.Error(w, "请先添加节点", 500)
+		return
+	}
 	// 1. 读取文件
 	file, header, err := r.FormFile("file")
 	if err != nil {
@@ -186,13 +195,6 @@ func (File) UploadHandler(w http.ResponseWriter, r *http.Request) {
 		for j := 0; j < common.M; j++ {
 			parities[j][i] = xor
 		}
-	}
-
-	// 7.2 获取节点
-	ns, err := pickNodesByUser(claims.UserID, common.K+common.M)
-	if err != nil {
-		http.Error(w, err.Error(), 500)
-		return
 	}
 
 	// 7.3 先创建file_content记录（获取content_id）

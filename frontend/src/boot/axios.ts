@@ -24,7 +24,7 @@ api.interceptors.request.use(
     // const { cookies } = LocalStorage.getItem("token");
     const token = LocalStorage.getItem('token');
     if (token) {
-      config.headers['X-Token'] = token;
+      config.headers['Authorization'] = token as string;
     }
     return config;
   },

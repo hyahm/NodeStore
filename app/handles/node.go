@@ -1,11 +1,16 @@
 package handles
 
 import (
+	"fmt"
 	"net/http"
 	"nodestore/app/db"
 	"nodestore/app/module"
 	"nodestore/app/response"
+	"sync"
 	"time"
+
+	"github.com/go-resty/resty/v2"
+	"github.com/hyahm/golog"
 )
 
 type Node struct{}
@@ -53,18 +58,48 @@ func (Node) RemoveNodeHandler(w http.ResponseWriter, r *http.Request) {
 	// w.Write([]byte("node removed"))
 }
 
+type Nodes struct {
+	Url   string `json:"url"`
+	Alive bool   `json:"alive"`
+}
+
 func (Node) ListNodesHandler(w http.ResponseWriter, r *http.Request) {
 	claims, err := module.GetCurrentUser(r)
 	if err != nil {
 		http.Error(w, err.Error(), 401)
 		return
 	}
-	var nodes []string
+	nodes := make([]string, 0)
+	golog.Info(claims.UserID)
 	err = db.DB.Raw(`SELECT address FROM nodes WHERE user_id=?`, claims.UserID).Scan(&nodes).Error
 	if err != nil {
 		http.Error(w, err.Error(), 401)
 		return
 	}
-	response.Success(r, "ok", nodes)
+	ns := make([]Nodes, 0, len(nodes))
+	cli := resty.New()
+	wg := sync.WaitGroup{}
+	for _, v := range nodes {
+		wg.Go(func() {
+			resp, err := cli.SetTimeout(time.Second).R().Get(fmt.Sprintf("%s/health", v))
+			if err == nil {
+				if resp.StatusCode() == 200 {
+					ns = append(ns, Nodes{
+						Url:   v,
+						Alive: true,
+					})
+				}
+				return
+			}
+			ns = append(ns, Nodes{
+				Url:   v,
+				Alive: true,
+			})
+		})
+
+	}
+	wg.Wait()
+	golog.Info(ns)
+	response.Success(r, "ok", ns)
 	// json.NewEncoder(w).Encode(map[string]interface{}{"nodes": nodes})
 }

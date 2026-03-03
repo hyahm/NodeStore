@@ -26,10 +26,23 @@ const routes: Array<RouteRecordRaw> = [
     children: [
       {
         path: '',
-        component: FileManager
+        component: FileManager,
+        name: 'FileManagement',
+        meta: {
+          title: '文件管理' // 页面标题
+        }
+      },
+      {
+        path: '/node-management',
+        component: () => import('pages/NodeManagement.vue'),
+        name: 'NodeManagement',
+        meta: {
+          title: '节点管理' // 页面标题
+        }
       }
     ]
-  }
+  },
+   
 ];
 
 // 创建路由实例
